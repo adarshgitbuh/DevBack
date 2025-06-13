@@ -19,7 +19,6 @@ app.post("/signup", async (req, res) => {
 
 app.get("/users", async (req, res) => {
   const userEmail = req.body.email;
-
   try {
     const users = await User.findOne({ email: userEmail });
     if (users.length == 0) {
@@ -38,6 +37,27 @@ app.get("/feed", async (req, res) => {
     res.send(users);
   } catch (error) {
     res.status(400).send("something went wrong");
+  }
+});
+
+app.delete("/delete", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    res.send("User deleted successfully");
+  } catch (error) {
+    res.status(400).send("Error deleting user: " + error.message);
+  }
+});
+
+app.patch("/update", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    await User.findByIdAndUpdate({ _id: userId }, data);
+    res.send("User updated successfully");
+  } catch (error) {
+    res.status(400).send("Error updating user: " + error.message);
   }
 });
 
