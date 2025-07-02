@@ -1,21 +1,15 @@
 const express = require("express");
 const connectToDatabase = require("./config/database");
+const bcrypt = require("bcrypt");
 const app = express();
 const User = require("./models/users");
+const { validateSignUpData } = require("./utils/validation");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json()); // Middleware to parse JSON bodies
+app.use(cookieParser()); // Middleware to parse cookies
 
-app.post("/signup", async (req, res) => {
-  //create the new user instance
-  const user = new User(req.body);
-
-  try {
-    await user.save();
-    res.send("User created successfully");
-  } catch (error) {
-    res.status(400).send("error creating user: " + error.message);
-  }
-});
 
 app.get("/users", async (req, res) => {
   const userEmail = req.body.email;
@@ -68,7 +62,7 @@ app.patch("/update/:userId", async (req, res) => {
     if (!isUpdateAllowed) {
       throw new Error("Update not allowed");
     }
-    if(data?.skills.length > 5) {
+    if (data?.skills.length > 5) {
       throw new Error("Skills cannot be more than 5");
     }
 
