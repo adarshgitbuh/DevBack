@@ -1,8 +1,11 @@
 const express = require("express");
+const { userAuth } = require("../midlewares/auth");
+const jwt = require("jsonwebtoken");
+const User = require("../models/users");
 
 const profilrRouter = express.Router();
 
-profilrRouter.get("/profile", async (req, res) => {
+profilrRouter.get("/profile", userAuth, async (req, res) => {
   try {
     const cookies = req.cookies;
 
@@ -14,7 +17,6 @@ profilrRouter.get("/profile", async (req, res) => {
     const decodedMessage = await jwt.verify(token, "Devtinder$2002");
 
     const { _id } = decodedMessage;
-    
 
     const user = await User.findById(_id);
     if (!user) {
